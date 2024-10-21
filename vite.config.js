@@ -22,10 +22,6 @@ export default defineConfig({
     ]
   },
   server: {
-    https: {
-      key: fs.readFileSync(path.resolve('./key.pem')),
-      cert: fs.readFileSync(path.resolve('./cert.pem')),
-    },
     host: true,
     port: 443, // Use 8443 to avoid needing root privileges
 	proxy: {},
