@@ -1,0 +1,133 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   Int                     @id @default(autoincrement())
+  username             String?                 @unique
+  email                String                  @unique
+  passwordHash         String?                 // Optional for Google Sign-In users
+  firstName            String?
+  lastName             String?
+  profileImage         Bytes?                  // Changed from String? to Bytes?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  authProvider         String                  @default("local") // Indicates the authentication provider
+
+  // Relationships
+  createdEvents        Event[]                 @relation("CreatedEvents")             // Events created by the user
+  bookingsOrganized    Booking[]               @relation("OrganizerBookings")        // Bookings organized by the user
+  bookingParticipants  BookingParticipant[]    // User's participation in bookings
+  notifications        Notification[]
+  calendar             Calendar?
+  googleSyncToken      GoogleSyncToken?
+  settings             User_Settings?
+}
+
+model Event {
+  id               Int              @id @default(autoincrement())
+  title            String
+  description      String?          // Optional description for Google Calendar events
+  duration         Int
+  platform         String
+  startTime        DateTime
+  endTime          DateTime
+  creatorId        Int
+  creator          User             @relation("CreatedEvents", fields: [creatorId], references: [id])
+
+  // Relationships
+  bookings         Booking[]
+  calendarEvents   CalendarEvent[]
+}
+
+model Booking {
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  organizerId   Int
+  status        String   @default("PENDING") // Allowed values: "PENDING", "CONFIRMED", "CANCELLED"
+  googleEventId String?  // Added to store Google Calendar Event ID
+  deletedAt     DateTime? // For soft deletes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relationships
+  event         Event @relation(fields: [eventId], references: [id])
+  organizer     User  @relation("OrganizerBookings", fields: [organizerId], references: [id])
+  participants  BookingParticipant[]
+}
+
+model BookingParticipant {
+  bookingId Int
+  userId    Int
+  response  String @default("PENDING") // Allowed values: "PENDING", "CONFIRMED", "DECLINED"
+
+  // Relationships
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([bookingId, userId]) // Composite Unique Constraint
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  sent      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user       User @relation(fields: [userId], references: [id])
+}
+
+model Calendar {
+  id               Int              @id @default(autoincrement())
+  userId           Int              @unique
+  googleCalendarId String?          @unique
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relationships
+  user             User            @relation(fields: [userId], references: [id])
+  calendarEvents   CalendarEvent[]
+}
+
+model CalendarEvent {
+  id             Int      @id @default(autoincrement())
+  calendarId     Int
+  eventId        Int
+  googleEventId  String?
+
+  // Relationships
+  calendar       Calendar @relation(fields: [calendarId], references: [id])
+  event          Event    @relation(fields: [eventId], references: [id])
+}
+
+model GoogleSyncToken {
+  userId       Int      @id
+  accessToken  String
+  refreshToken String
+  tokenType    String
+  expiryDate   DateTime
+  scope        String?
+  idToken      String?
+
+  // Relationships
+  user         User @relation(fields: [userId], references: [id])
+}
+
+model User_Settings {
+  userId        Int     @id
+  receiveEmails Boolean @default(true)
+
+  // Relationships
+  user          User @relation(fields: [userId], references: [id])
+}

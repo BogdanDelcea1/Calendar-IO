@@ -1,0 +1,200 @@
+// src/lib/googleCalendar.js
+
+import { google } from 'googleapis';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// Initialize Google OAuth2 Client
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+// Function to get authenticated calendar client for a user
+async function getAuthenticatedCalendarClient(userId) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { googleSyncToken: true },
+  });
+
+  if (!user || !user.googleSyncToken) {
+    throw new Error('User does not have a valid Google Sync Token.');
+  }
+
+  oauth2Client.setCredentials({
+    access_token: user.googleSyncToken.accessToken,
+    refresh_token: user.googleSyncToken.refreshToken,
+    scope: user.googleSyncToken.scope,
+    token_type: user.googleSyncToken.tokenType,
+    expiry_date: user.googleSyncToken.expiryDate.getTime(),
+    id_token: user.googleSyncToken.idToken,
+  });
+
+  // Automatically refresh the token if expired
+  oauth2Client.on('tokens', async (tokens) => {
+    if (tokens.refresh_token) {
+      await prisma.googleSyncToken.update({
+        where: { userId: userId },
+        data: {
+          refreshToken: tokens.refresh_token,
+        },
+      });
+    }
+    if (tokens.access_token) {
+      await prisma.googleSyncToken.update({
+        where: { userId: userId },
+        data: {
+          accessToken: tokens.access_token,
+          expiryDate: new Date(tokens.expiry_date),
+        },
+      });
+    }
+  });
+
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  return calendar;
+}
+
+// Function to create a Google Calendar event with all attendees
+export async function sendGoogleCalendarEvent(booking) {
+  try {
+    const organizer = booking.organizer;
+    const participants = booking.participants.map(p => p.user);
+
+    const organizerCalendarId = organizer.googleCalendarId; // Ensure this field exists
+    if (!organizerCalendarId) {
+      throw new Error('Organizer does not have a Google Calendar ID.');
+    }
+
+    const attendeeEmails = participants
+      .map(p => p.email)
+      .filter(email => email && email !== organizer.email); // Exclude organizer's email if present
+
+    const event = {
+      summary: booking.event.title,
+      description: booking.event.description || '',
+      start: {
+        dateTime: booking.event.startTime.toISOString(),
+      },
+      end: {
+        dateTime: booking.event.endTime.toISOString(),
+      },
+      attendees: [
+        { email: organizer.email },
+        ...attendeeEmails.map(email => ({ email })),
+      ],
+      reminders: {
+        useDefault: true,
+      },
+    };
+
+    const calendar = await getAuthenticatedCalendarClient(organizer.id);
+
+    const createdEvent = await calendar.events.insert({
+      calendarId: organizerCalendarId,
+      resource: event,
+      sendUpdates: 'all',
+    });
+
+    console.log(`Event created on organizer's Google Calendar: ${createdEvent.data.id}`);
+
+    // Store the Google Event ID in the booking for future updates or deletions
+    await prisma.booking.update({
+      where: { id: booking.id },
+      data: {
+        googleEventId: createdEvent.data.id, // Ensure `googleEventId` field exists in the Booking model
+      },
+    });
+  } catch (err) {
+    console.error('Error creating Google Calendar event:', err);
+    // Optionally, update booking status or notify users about the failure
+  }
+}
+
+// Function to update a Google Calendar event
+export async function updateGoogleCalendarEvent(booking) {
+  try {
+    const organizer = booking.organizer;
+    const participants = booking.participants.map(p => p.user);
+
+    const organizerCalendarId = organizer.googleCalendarId;
+    if (!organizerCalendarId) {
+      throw new Error('Organizer does not have a Google Calendar ID.');
+    }
+
+    const attendeeEmails = participants
+      .map(p => p.email)
+      .filter(email => email && email !== organizer.email); // Exclude organizer's email if present
+
+    const event = {
+      summary: booking.event.title,
+      description: booking.event.description || '',
+      start: {
+        dateTime: booking.event.startTime.toISOString(),
+      },
+      end: {
+        dateTime: booking.event.endTime.toISOString(),
+      },
+      attendees: [
+        { email: organizer.email },
+        ...attendeeEmails.map(email => ({ email })),
+      ],
+      reminders: {
+        useDefault: true,
+      },
+    };
+
+    const calendar = await getAuthenticatedCalendarClient(organizer.id);
+
+    if (!booking.googleEventId) {
+      // If no Google Event ID exists, create a new event
+      await sendGoogleCalendarEvent(booking);
+      return;
+    }
+
+    // Update the existing event
+    const updatedEvent = await calendar.events.update({
+      calendarId: organizerCalendarId,
+      eventId: booking.googleEventId,
+      resource: event,
+      sendUpdates: 'all',
+    });
+
+    console.log(`Event updated on organizer's Google Calendar: ${updatedEvent.data.id}`);
+  } catch (err) {
+    console.error('Error updating Google Calendar event:', err);
+    // Optionally, notify users about the failure
+  }
+}
+
+// Function to delete a Google Calendar event
+export async function deleteGoogleCalendarEvent(booking) {
+  try {
+    const organizer = booking.organizer;
+
+    const organizerCalendarId = organizer.googleCalendarId;
+    if (!organizerCalendarId) {
+      throw new Error('Organizer does not have a Google Calendar ID.');
+    }
+
+    if (!booking.googleEventId) {
+      console.warn('No Google Event ID found for this booking. Skipping deletion.');
+      return;
+    }
+
+    const calendar = await getAuthenticatedCalendarClient(organizer.id);
+
+    await calendar.events.delete({
+      calendarId: organizerCalendarId,
+      eventId: booking.googleEventId,
+      sendUpdates: 'all',
+    });
+
+    console.log(`Event deleted from organizer's Google Calendar: ${booking.googleEventId}`);
+  } catch (err) {
+    console.error('Error deleting Google Calendar event:', err);
+    // Optionally, notify users about the failure
+  }
+}
