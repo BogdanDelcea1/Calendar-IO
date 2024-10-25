@@ -42,6 +42,7 @@
 		"@fullcalendar/timegrid": "^5.11.3",
 		"@prisma/client": "^5.21.0",
 		"@sveltejs/adapter-node": "^5.2.4",
+		"@sveltejs/adapter-vercel": "^5.4.5",
 		"@sveltejs/kit": "next",
 		"bcrypt": "^5.1.1",
 		"bcryptjs": "^2.4.3",
