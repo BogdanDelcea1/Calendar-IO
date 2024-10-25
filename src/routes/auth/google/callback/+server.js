@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
-const REDIRECT_URI = 'https://localhost:443/auth/google/callback'; // Ensure this matches the URI in GCP
+const REDIRECT_URI = 'https://consilier-delcea.online/auth/google/callback'; // Ensure this matches the URI in GCP
 
 const oauth2Client = new OAuth2Client(
   CLIENT_ID,
