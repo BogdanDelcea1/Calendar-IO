@@ -21,7 +21,7 @@
     darkMode.set(localStorage.getItem('darkMode') === 'true');
   }
 
-  // Toggle night mode
+  // Toggle night mode function
   function toggleNightMode() {
     darkMode.update((value) => {
       const newValue = !value;
@@ -31,7 +31,6 @@
       }
       return newValue;
     });
-    handleButtonClick(); // Track clicks for Easter egg
   }
 
   // Logout function
@@ -55,7 +54,6 @@
       console.error('Error during logout:', error);
       await goto('/login');
     }
-    handleButtonClick(); // Track clicks for Easter egg
   }
 
   // Handle button clicks for Easter egg
@@ -209,3 +207,8 @@
     transition: border-color 0.5s ease;
   }
 </style>
+
+
+
+
+

@@ -1,3 +1,4 @@
+//src/routes/api/auth/google/+server.js
 import { google } from 'googleapis';
 // Correct import statement in +server.js
 import jwt from 'jsonwebtoken';

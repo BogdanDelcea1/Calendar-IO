@@ -1,3 +1,5 @@
+//src/routes/api/auth/google/callback/+server.js
+
 import { google } from 'googleapis';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';

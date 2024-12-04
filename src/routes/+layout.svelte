@@ -2,6 +2,7 @@
 
 <script>
   import Navbar from '$components/Navbar.svelte';
+
 </script>
 
 <main>
@@ -23,7 +24,7 @@
   /* Headings (h2) styling */
   :global(h2) {
     color: black; /* Default h2 color for light mode */
-    font-size: 2rem; /* Adjust font size if needed */
+    font-size: 2rem;
     margin-bottom: 1rem;
   }
 
@@ -67,3 +68,10 @@
     }
   }
 </style>
+
+
+
+
+
+
+
