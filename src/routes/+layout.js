@@ -1,12 +1,12 @@
 // src/routes/+layout.server.js
 
 import { PrismaClient } from '@prisma/client';
-import { dev } from '$app/environment';
+//import { dev } from '$app/environment';
 import { injectAnalytics } from '@vercel/analytics/sveltekit';
 import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 
 
-injectAnalytics({ mode: dev ? 'development' : 'production' });
+injectAnalytics();
 injectSpeedInsights();
 
 
