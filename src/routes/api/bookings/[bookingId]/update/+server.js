@@ -1,5 +1,3 @@
-// src/routes/api/bookings/[bookingId]/update/+server.js
-
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 // Import Google Calendar functions if needed
@@ -39,8 +37,27 @@ export async function PUT({ params, request, locals }) {
 
     const bookingData = bookingUpdateSchema.parse(data);
 
-    // 3. Participant Verification
-    // 3.1. Ensure organizer is not a participant
+    // Log start and end times to debug potential issues
+    console.log('Parsed startTime:', bookingData.startTime);
+    console.log('Parsed endTime:', bookingData.endTime);
+
+    const startTime = new Date(bookingData.startTime);
+    const endTime = new Date(bookingData.endTime);
+
+    // 3. Validate that startTime is before endTime
+    if (startTime >= endTime) {
+      console.error('Start time must be before end time.');
+      return new Response(
+        JSON.stringify({ error: 'Start time must be before end time.' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // 4. Participant Verification
+    // 4.1. Ensure organizer is not a participant
     if (bookingData.participantIds.includes(user.id)) {
       return new Response(JSON.stringify({ error: 'Organizer cannot be a participant.' }), {
         status: 400,
@@ -48,7 +65,7 @@ export async function PUT({ params, request, locals }) {
       });
     }
 
-    // 3.2. Verify that all participant IDs exist
+    // 4.2. Verify that all participant IDs exist
     const participants = await prisma.user.findMany({
       where: { id: { in: bookingData.participantIds } },
       select: { id: true, email: true, username: true }, // Select necessary fields for notifications
@@ -61,7 +78,7 @@ export async function PUT({ params, request, locals }) {
       });
     }
 
-    // 4. Fetch existing booking
+    // 5. Fetch existing booking
     const existingBooking = await prisma.booking.findUnique({
       where: { id: parseInt(bookingId, 10) },
       include: {
@@ -78,7 +95,7 @@ export async function PUT({ params, request, locals }) {
       });
     }
 
-    // 5. Authorization: Only the organizer can update the booking
+    // 6. Authorization: Only the organizer can update the booking
     if (existingBooking.organizerId !== user.id) {
       return new Response(JSON.stringify({ error: 'You are not authorized to update this booking.' }), {
         status: 403,
@@ -86,7 +103,7 @@ export async function PUT({ params, request, locals }) {
       });
     }
 
-    // 6. Update Event details
+    // 7. Update Event details
     const updatedEvent = await prisma.event.update({
       where: { id: existingBooking.eventId },
       data: {
@@ -94,21 +111,22 @@ export async function PUT({ params, request, locals }) {
         description: bookingData.description,
         duration: bookingData.duration,
         platform: bookingData.platform,
-        startTime: new Date(bookingData.startTime),
-        endTime: new Date(bookingData.endTime),
+        startTime,
+        endTime,
       },
     });
 
-    // 7. Update Booking Participants
-    // 7.1. Remove all existing participants
+    console.log('Event updated successfully:', updatedEvent);
+
+    // 8. Update Booking Participants
+    // 8.1. Remove all existing participants
     await prisma.bookingParticipant.deleteMany({
       where: { bookingId: existingBooking.id },
     });
 
     console.log(`Deleted existing participants for Booking ID ${existingBooking.id}`);
 
-    // 7.2. Add new participants with response: "PENDING"
-    // Ensure participantIds are unique
+    // 8.2. Add new participants with response: "PENDING"
     const uniqueParticipantIds = Array.from(new Set(bookingData.participantIds));
 
     await prisma.bookingParticipant.createMany({
@@ -117,12 +135,11 @@ export async function PUT({ params, request, locals }) {
         userId: participantId,
         response: 'PENDING', // Reset confirmation status
       })),
-      // Remove 'skipDuplicates: true' as it's unsupported in SQLite
     });
 
     console.log(`Added new participants for Booking ID ${existingBooking.id}`);
 
-    // 8. Fetch the updated booking
+    // 9. Fetch the updated booking
     const updatedBooking = await prisma.booking.findUnique({
       where: { id: existingBooking.id },
       include: {
@@ -134,16 +151,13 @@ export async function PUT({ params, request, locals }) {
 
     console.log('Booking updated successfully:', updatedBooking);
 
-    // 9. Google Calendar Integration
+    // 10. Google Calendar Integration
     // If the booking is already confirmed, update the Google Calendar event
     if (updatedBooking.status === 'CONFIRMED') {
       // Uncomment and implement if needed
       // await updateGoogleCalendarEvent(updatedBooking);
       // await inviteParticipantsToGoogleEvent(updatedBooking);
     }
-
-    // 10. Notifications
-    // TODO: Notify new participants about the updated booking for confirmation
 
     // 11. Return Response
     return new Response(JSON.stringify({ booking: updatedBooking }), {
