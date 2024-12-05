@@ -110,22 +110,14 @@ export async function POST({ request, locals }) {
 
     console.log('Participants assigned to booking:', updatedBooking.participants);
 
-    // 7. Google Calendar Integration
-    // **Do not** create the Google Calendar event here to prevent double bookings.
-    // The event will be created upon participant confirmation.
 
-    // 8. Notifications
-    // TODO: Notify participants about the new booking for confirmation
-    // Example:
-    // await notifyParticipants(participants, updatedBooking);
-
-    // 9. Return Response
+    // 7. Return Response
     return new Response(JSON.stringify({ booking: updatedBooking }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    // 10. Error Handling
+    // 8. Error Handling
     if (err instanceof z.ZodError) {
       console.error('Validation Error:', err.errors);
       return new Response(

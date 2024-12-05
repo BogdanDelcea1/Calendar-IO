@@ -8,7 +8,7 @@ config();
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = 'https://consilier-delcea.online/auth/google/callback'; // Ensure this matches the URI in GCP
+const REDIRECT_URI = 'https://consilier-delcea.online/auth/google/callback'; 
 
 const prisma = new PrismaClient();
 
@@ -55,3 +55,6 @@ export async function getOAuth2Client(userId) {
 
   return oauth2Client;
 }
+
+
+
