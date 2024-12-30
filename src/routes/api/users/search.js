@@ -19,7 +19,7 @@ export async function GET({ url }) {
         },
       },
       select: { id: true, username: true },
-      take: 10, // Limit results
+      take: 10, // Limit results to 10 (avoid unecessary headless server function calls)
     });
 
     return new Response(JSON.stringify(users), { status: 200 });

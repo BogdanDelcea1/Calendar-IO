@@ -5,7 +5,7 @@
   export let data;
 
   let bookings = data.bookings || [];
-  let user = data.user; // Assuming `user` is included in the data
+  let user = data.user; 
 
   // Function to navigate to the edit booking page
   function editBooking(bookingId) {

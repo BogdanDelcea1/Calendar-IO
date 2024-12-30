@@ -1,4 +1,4 @@
-<!-- src/routes/__layout.svelte or wherever your navigation is defined -->
+<!-- src/routes/__layout.svelte-->
 
 <script>
     import { goto } from '$app/navigation';

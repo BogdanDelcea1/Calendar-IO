@@ -4,7 +4,6 @@ import { google } from 'googleapis';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
-// Correct import statement in +server.js
 const prisma = new PrismaClient();
 
 const oauth2Client = new google.auth.OAuth2(

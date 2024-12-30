@@ -2,7 +2,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { error } from '@sveltejs/kit';
-import { deleteGoogleCalendarEvent } from '$lib/googleCalendar'; // Ensure this function is implemented
+import { deleteGoogleCalendarEvent } from '$lib/googleCalendar'; 
 
 const prisma = new PrismaClient();
 
@@ -45,8 +45,6 @@ export async function DELETE({ params, locals }) {
       console.log(`Deleted Google Calendar event for Booking ID ${bookingId}`);
     } catch (calendarError) {
       console.error('Error deleting Google Calendar event:', calendarError);
-      // Depending on your needs, you might want to throw an error here
-      // throw error(500, 'Failed to delete Google Calendar event.');
     }
   }
 

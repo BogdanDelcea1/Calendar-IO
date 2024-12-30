@@ -5,7 +5,7 @@ import { z } from 'zod';
 import {
   createGoogleCalendarEvent,
   inviteParticipantsToGoogleEvent,
-} from '$lib/googleCalendar'; // Ensure these functions are correctly implemented
+} from '$lib/googleCalendar'; 
 
 const prisma = new PrismaClient();
 
@@ -193,7 +193,6 @@ export async function POST({ params, request, locals }) {
           console.log(`Google Calendar event created and participants invited for Booking ID ${booking.id}.`);
         } catch (calendarError) {
           console.error('Google Calendar Integration Error:', calendarError);
-          // Optionally, handle this error differently, e.g., revert booking status or notify organizer
         }
       } catch (statusUpdateError) {
         console.error('Error updating booking status:', statusUpdateError);

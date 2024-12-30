@@ -14,7 +14,7 @@ export async function load({ params, locals, url }) {
     }
 
     const creatorId = parseInt(params.userId, 10);
-    const bookingId = parseInt(params.eventId, 10); // Assuming eventId refers to bookingId
+    const bookingId = parseInt(params.eventId, 10); 
 
     if (isNaN(creatorId) || isNaN(bookingId)) {
       console.error('Invalid creator ID or booking ID:', params.userId, params.eventId);
@@ -129,7 +129,7 @@ export const actions = {
 
       console.log('Booking confirmed successfully:', updatedBooking);
 
-      // Redirect to calendar or success page
+      // Redirect to calendar
       throw redirect(303, '/bookings/mine');
     } catch (err) {
       console.error('Error confirming booking:', err);

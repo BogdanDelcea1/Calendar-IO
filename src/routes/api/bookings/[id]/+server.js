@@ -58,8 +58,6 @@ export async function PUT({ request, params, locals }) {
       data: { response: 'PENDING' },
     });
 
-    // TODO: Notify participants about the booking modification
-
     return new Response(JSON.stringify({ booking: updatedBooking }), { status: 200 });
   } catch (error) {
     console.error('Error updating booking:', error);
@@ -91,8 +89,6 @@ export async function DELETE({ params, locals }) {
     await prisma.booking.delete({
       where: { id: bookingId },
     });
-
-    // TODO: Notify participants about the booking cancellation
 
     return new Response(JSON.stringify({ message: 'Booking deleted successfully' }), { status: 200 });
   } catch (error) {

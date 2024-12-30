@@ -1,8 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-// Import Google Calendar functions if needed
-// import { updateGoogleCalendarEvent } from '$lib/googleCalendar';
-
 const prisma = new PrismaClient();
 
 // Define the schema for updating booking data using Zod
@@ -151,21 +148,14 @@ export async function PUT({ params, request, locals }) {
 
     console.log('Booking updated successfully:', updatedBooking);
 
-    // 10. Google Calendar Integration
-    // If the booking is already confirmed, update the Google Calendar event
-    if (updatedBooking.status === 'CONFIRMED') {
-      // Uncomment and implement if needed
-      // await updateGoogleCalendarEvent(updatedBooking);
-      // await inviteParticipantsToGoogleEvent(updatedBooking);
-    }
 
-    // 11. Return Response
+    // 10. Return Response
     return new Response(JSON.stringify({ booking: updatedBooking }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    // 12. Error Handling
+    // 11. Error Handling
     if (err instanceof z.ZodError) {
       console.error('Validation Error:', err.errors);
       return new Response(

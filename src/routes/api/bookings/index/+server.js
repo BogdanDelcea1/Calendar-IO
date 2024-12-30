@@ -56,7 +56,6 @@ export async function POST({ request, locals }) {
 }
 
 export async function GET({ locals }) {
-  // This endpoint can be used for fetching bookings for the calendar
   if (!locals.user) {
     return new Response(JSON.stringify({ error: 'Unauthorized.' }), {
       status: 401,

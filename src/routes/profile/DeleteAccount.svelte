@@ -28,10 +28,10 @@
   
         if (res.ok) {
           success = result.message || 'Your account has been deleted.';
-          // Redirect to home page after a short delay
+          // Redirect to home page
           setTimeout(() => {
             goto('/');
-          }, 2000);
+          });
         } else {
           error = result.error || 'Failed to delete account.';
         }

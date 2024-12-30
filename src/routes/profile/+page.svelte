@@ -26,7 +26,7 @@
       }
 
       if (imageData) {
-        const blob = new Blob([imageData], { type: 'image/jpeg' });
+        const blob = new Blob([imageData], { type: 'image/png' });
         const reader = new FileReader();
         reader.onload = function (e) {
           profileImage = e.target.result;
@@ -40,9 +40,9 @@
     profileImageFile = event.target.files[0];
 
     // Limit the file size to prevent large uploads
-    const maxSize = 2 * 1024 * 1024; // 2 MB
+    const maxSize = 16 * 1024 * 1024; // 16 MB
     if (profileImageFile.size > maxSize) {
-      alert('Image size exceeds the maximum allowed size of 2 MB.');
+      alert('Image size exceeds the maximum allowed size of 16 MB.');
       profileImageFile = null;
       event.target.value = ''; // Clear the file input
       return;

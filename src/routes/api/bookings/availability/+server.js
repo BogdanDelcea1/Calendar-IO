@@ -27,7 +27,6 @@ export async function GET({ url, locals }) {
       })
     ]);
 
-    // Generate availability slots (simplified example)
     const availability = generateCommonAvailability(userEvents, targetUserEvents, duration);
 
     return new Response(JSON.stringify(availability), { status: 200 });
@@ -37,9 +36,7 @@ export async function GET({ url, locals }) {
 }
 
 function generateCommonAvailability(userEvents, targetUserEvents, duration) {
-  // For simplicity, assume both users are available from 9 AM to 5 PM, Monday to Friday
   // Exclude times where either user has an event
-
   // Generate time slots
   const slots = [];
   const now = new Date();

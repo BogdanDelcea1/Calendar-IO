@@ -60,7 +60,7 @@
       if (response.ok) {
         const result = await response.json();
         console.log('Booking created:', result);
-        // Redirect to bookings list or confirmation page
+        // Redirect to bookings list page
         goto('/bookings/list');
       } else {
         const result = await response.json();
@@ -74,7 +74,6 @@
   }
 
   onMount(() => {
-    // Any additional initialization if needed
   });
 </script>
 

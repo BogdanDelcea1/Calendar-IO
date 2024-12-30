@@ -27,7 +27,6 @@ export async function GET({ url }) {
       where: {
         username: {
           contains: query,
-          // 'mode' is not supported in SQLite, so it's removed
         },
       },
       select: { id: true, username: true },

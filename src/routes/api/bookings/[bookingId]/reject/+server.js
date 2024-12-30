@@ -65,8 +65,6 @@ export async function POST({ params, locals }) {
 
     console.log('Booking rejected successfully:', updatedBooking);
 
-    // Optionally, remove event from Google Calendars if already added
-    // This requires storing Google Event IDs when adding to calendars
 
     return json({ message: 'Booking rejected successfully.' }, { status: 200 });
   } catch (err) {

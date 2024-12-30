@@ -38,10 +38,10 @@ export async function POST({ request, locals }) {
           connect: { id: event.id } // Connect to the event using the event ID
         },
         participant: {
-          connect: { id: participantId } // Connect to the participant (invited person)
+          connect: { id: participantId } // Connect to the participant
         },
         organizer: {
-          connect: { id: creatorId } // Connect to the organizer (person creating the booking)
+          connect: { id: creatorId } // Connect to the organizer
         },
         status: 'CONFIRMED'
       }

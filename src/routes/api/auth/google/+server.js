@@ -1,8 +1,5 @@
 //src/routes/api/auth/google/+server.js
 import { google } from 'googleapis';
-// Correct import statement in +server.js
-import jwt from 'jsonwebtoken';
-
 
 const oauth2Client = new google.auth.OAuth2(
   'YOUR_CLIENT_ID',

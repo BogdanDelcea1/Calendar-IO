@@ -288,7 +288,6 @@
     background-color: #45a049;
   }
 
-  /* Delete button styling */
   button[style*="background-color: #f44336"] {
     background-color: #f44336;
   }

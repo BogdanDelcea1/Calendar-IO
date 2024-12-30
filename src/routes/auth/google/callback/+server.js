@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
-const REDIRECT_URI = 'https://consilier-delcea.online/auth/google/callback'; // Ensure this matches the URI in GCP
+const REDIRECT_URI = 'https://consilier-delcea.online/auth/google/callback';
 
 const oauth2Client = new OAuth2Client(
   CLIENT_ID,
@@ -103,13 +103,12 @@ export async function GET({ url }) {
     const cookie = serialize('session', jwtToken, {
       httpOnly: true,
       path: '/',
-      sameSite: 'lax', // Changed from 'strict' to 'lax'
-      //secure: process.env.NODE_ENV === 'production', // true in production, false otherwise
+      sameSite: 'lax', 
       secure: true,
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
-    // Redirect to the dashboard or desired page
+    // Redirect to the calendar dashboard
     return new Response(null, {
       status: 302,
       headers: {

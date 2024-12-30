@@ -99,8 +99,6 @@ export async function POST({ request, locals }) {
     console.log('Booking created successfully:', newBooking);
 
     // 6. Participant Assignment
-    // Option 1: Check Before Creating to prevent duplicate entries
-
     // Initialize an array to hold successfully created participants
     const createdParticipants = [];
 

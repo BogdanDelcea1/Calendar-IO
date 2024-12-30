@@ -34,7 +34,7 @@
 
       if (res.ok) {
         success = data.message;
-        // Redirect to the calendar or another protected page
+        // Redirect to the calendar page
         setTimeout(() => {
           goto('/calendar');
         }, 2000);

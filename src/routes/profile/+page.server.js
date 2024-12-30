@@ -60,18 +60,18 @@ export const actions = {
         typeof profileImage === 'object' &&
         profileImage.size > 0
       ) {
-        const maxSize = 2 * 1024 * 1024; // 2 MB
+        const maxSize = 16 * 1024 * 1024; // 16 MB
 
         if (profileImage.size > maxSize) {
           return fail(400, {
-            error: 'Image size exceeds the maximum allowed size of 2 MB.',
+            error: 'Image size exceeds the maximum allowed size of 16 MB.',
           });
         }
 
         const arrayBuffer = await profileImage.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const fileType = profileImage.type;
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        const allowedTypes = ['image/png'];
 
         if (!allowedTypes.includes(fileType)) {
           return fail(400, {

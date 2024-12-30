@@ -2,13 +2,6 @@
 
 import { PrismaClient } from '@prisma/client';
 import { dev } from '$app/environment';
-//import { injectAnalytics } from '@vercel/analytics/sveltekit';
-import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-
-
-//injectAnalytics({ mode: dev ? 'development' : 'production' });
-injectSpeedInsights();
-
 
 const prisma = new PrismaClient();
 
@@ -22,7 +15,7 @@ export const load = async ({ locals }) => {
       // Convert binary data to a Base64 string
       const base64String = Buffer.from(user.profileImage).toString('base64');
       // Include the data URL prefix
-      user.profileImage = `data:image/jpeg;base64,${base64String}`;
+      user.profileImage = `data:image/png;base64,${base64String}`;
     }
 
     // Count pending booking requests

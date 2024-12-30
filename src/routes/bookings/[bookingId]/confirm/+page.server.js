@@ -5,9 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-/**
- * Load function to fetch booking details and pass them to the frontend.
- */
+ //Load function to fetch booking details and pass them to the frontend.
 export async function load({ params, locals }) {
   const { bookingId } = params;
 

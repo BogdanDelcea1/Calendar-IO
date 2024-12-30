@@ -9,7 +9,6 @@
     // Props passed from the server-side load function
     export let data;
   
-    // State variables
     let booking = data.booking;
     let error = '';
     let successMessage = '';
@@ -55,9 +54,8 @@
           successMessage = result.message || 'Your response has been recorded.';
           console.log('Success:', successMessage);
   
-          // Optionally, redirect the user after a successful confirmation
           setTimeout(() => {
-            goto('/bookings/list'); // Change this path as needed
+            goto('/bookings/list'); 
           }, 2000); // Redirect after 2 seconds
         } else {
           error = result.error || 'Failed to record your response.';
@@ -141,7 +139,6 @@
       cursor: not-allowed;
     }
   
-    /* Decline button styling */
     button[style*="background-color: #f44336"] {
       background-color: #f44336;
     }

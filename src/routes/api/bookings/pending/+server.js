@@ -19,7 +19,6 @@ export async function GET({ locals }) {
     const pendingBookings = await prisma.booking.findMany({
       where: {
         status: 'PENDING',
-        // Optionally, filter bookings where the user is either the organizer or a participant
         OR: [
           { organizerId: user.id },
           {
